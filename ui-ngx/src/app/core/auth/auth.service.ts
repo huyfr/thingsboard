@@ -112,22 +112,16 @@ export class AuthService {
 
   public login(loginRequest: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>('/api/auth/login', loginRequest, defaultHttpOptions()).pipe(
-      tap((loginResponse: LoginResponse) => {
-          this.setUserFromJwtToken(loginResponse.token, loginResponse.refreshToken, true);
-        }
-      ));
+      tap((loginResponse: LoginResponse) => {this.setUserFromJwtToken(loginResponse.token, loginResponse.refreshToken, true);}));
   }
 
   public publicLogin(publicId: string): Observable<LoginResponse> {
-    const publicLoginRequest: PublicLoginRequest = {
-      publicId
-    };
+    const publicLoginRequest: PublicLoginRequest = {publicId};
     return this.http.post<LoginResponse>('/api/auth/login/public', publicLoginRequest, defaultHttpOptions());
   }
 
   public sendResetPasswordLink(email: string) {
-    return this.http.post('/api/noauth/resetPasswordByEmail',
-      {email}, defaultHttpOptions());
+    return this.http.post('/api/noauth/resetPasswordByEmail', {email}, defaultHttpOptions());
   }
 
   public activate(activateToken: string, password: string, sendActivationMail: boolean): Observable<LoginResponse> {
@@ -148,8 +142,7 @@ export class AuthService {
   }
 
   public changePassword(currentPassword: string, newPassword: string) {
-    return this.http.post('/api/auth/changePassword',
-      {currentPassword, newPassword}, defaultHttpOptions());
+    return this.http.post('/api/auth/changePassword', {currentPassword, newPassword}, defaultHttpOptions());
   }
 
   public activateByEmailCode(emailCode: string): Observable<LoginResponse> {

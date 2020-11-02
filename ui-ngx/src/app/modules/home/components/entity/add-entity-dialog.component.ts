@@ -112,11 +112,7 @@ export class AddEntityDialogComponent extends
     this.submitted = true;
     if (this.detailsForm.valid) {
       this.entity = {...this.entity, ...this.entityComponent.entityFormValue()};
-      this.entitiesTableConfig.saveEntity(this.entity).subscribe(
-        (entity) => {
-          this.dialogRef.close(entity);
-        }
-      );
+      this.entitiesTableConfig.saveEntity(this.entity).subscribe((entity) => {this.dialogRef.close(entity);});
     }
   }
 }

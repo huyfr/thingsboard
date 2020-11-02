@@ -225,7 +225,14 @@ export class MenuService {
         type: 'link',
         path: '/auditLogs',
         icon: 'track_changes'
+      },
+      {
+        name: 'broadcast',
+        type: 'link',
+        path: '/devices',
+        icon: 'signal_wifi_4_bar'
       }
+
     );
     return sections;
   }

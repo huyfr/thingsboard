@@ -49,9 +49,7 @@ public abstract class BaseHttpDeviceApiTest extends AbstractControllerTest {
         device.setName("My device");
         device.setType("default");
         device = doPost("/api/device", device, Device.class);
-
-        deviceCredentials =
-                doGet("/api/device/" + device.getId().getId().toString() + "/credentials", DeviceCredentials.class);
+        deviceCredentials = doGet("/api/device/" + device.getId().getId().toString() + "/credentials", DeviceCredentials.class);
     }
 
     @Test

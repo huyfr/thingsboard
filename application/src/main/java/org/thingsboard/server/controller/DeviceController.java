@@ -104,8 +104,30 @@ public class DeviceController extends BaseController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+   /* @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
     @RequestMapping(value = "/device", method = RequestMethod.POST)
+    @ResponseBody
+    public Device saveDevice(@RequestBody Device device, @RequestParam(name = "accessToken", required = false) String accessToken) throws ThingsboardException {
+        try {
+            device.setTenantId(getCurrentUser().getTenantId());
+            checkEntity(device.getId(), device, Resource.DEVICE);
+            Device savedDevice = checkNotNull(deviceService.saveDeviceWithAccessToken(device, accessToken));
+            tbClusterService.pushMsgToCore(new DeviceNameOrTypeUpdateMsg(savedDevice.getTenantId(), savedDevice.getId(), savedDevice.getName(), savedDevice.getType()), null);
+            logEntityAction(savedDevice.getId(), savedDevice, savedDevice.getCustomerId(), device.getId() == null ? ActionType.ADDED : ActionType.UPDATED, null);
+            if (device.getId() == null) {
+                deviceStateService.onDeviceAdded(savedDevice);
+            } else {
+                deviceStateService.onDeviceUpdated(savedDevice);
+            }
+            return savedDevice;
+        } catch (Exception e) {
+            logEntityAction(emptyId(EntityType.DEVICE), device, null, device.getId() == null ? ActionType.ADDED : ActionType.UPDATED, e);
+            throw handleException(e);
+        }
+    }*/
+
+    @PreAuthorize("hasAnyAuthority('TENANT_ADMIN', 'CUSTOMER_USER')")
+    @RequestMapping(value = "/device/camera", method = RequestMethod.POST)
     @ResponseBody
     public Device saveDevice(@RequestBody Device device, @RequestParam(name = "accessToken", required = false) String accessToken) throws ThingsboardException {
         try {

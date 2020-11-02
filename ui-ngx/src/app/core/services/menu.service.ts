@@ -227,10 +227,10 @@ export class MenuService {
         icon: 'track_changes'
       },
       {
-        name: 'broadcast',
+        name: 'camera',
         type: 'link',
-        path: '/devices',
-        icon: 'signal_wifi_4_bar'
+        path: '/camera',
+        icon: 'camera_alt'
       }
 
     );

@@ -342,8 +342,7 @@ public abstract class BaseController {
 
     protected <I extends EntityId, T extends HasTenantId> void checkEntity(I entityId, T entity, Resource resource) throws ThingsboardException {
         if (entityId == null) {
-            accessControlService
-                    .checkPermission(getCurrentUser(), resource, Operation.CREATE, null, entity);
+            accessControlService.checkPermission(getCurrentUser(), resource, Operation.CREATE, null, entity);
         } else {
             checkEntityId(entityId, Operation.WRITE);
         }

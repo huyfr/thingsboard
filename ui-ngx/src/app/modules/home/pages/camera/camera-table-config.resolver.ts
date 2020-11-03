@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@angular/router';
+import {ActivatedRouteSnapshot, Resolve, Router} from '@angular/router';
 
 import { TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { EntityType, entityTypeResources, entityTypeTranslations } from '../../../../shared/models/entity-type.models';
 import { EntityAction } from '../../models/entity/entity-component.models';
 import { Device, DeviceCredentials, DeviceInfo } from '../../../../shared/models/device.models';
-import { DeviceComponent } from '../device/device.component';
 import { forkJoin, Observable, of } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { selectAuthUser } from '../../../../core/auth/auth.selectors';
@@ -19,7 +18,6 @@ import { CustomerService } from '../../../../core/http/customer.service';
 import { Customer } from '../../../../shared/models/customer.model';
 import { NULL_UUID } from '../../../../shared/models/id/has-uuid';
 import { BroadcastService } from '../../../../core/services/broadcast.service';
-import { DeviceTableHeaderComponent } from '../device/device-table-header.component';
 import { MatDialog } from '@angular/material/dialog';
 import {
   DeviceCredentialsDialogComponent,
@@ -35,18 +33,14 @@ import {
   AddEntitiesToCustomerDialogComponent,
   AddEntitiesToCustomerDialogData
 } from '../../dialogs/add-entities-to-customer-dialog.component';
-import { DeviceTabsComponent } from '../device/device-tabs.component';
 import { HomeDialogsService } from '../../dialogs/home-dialogs.service';
 import {
   CellActionDescriptor, checkBoxCell, DateEntityTableColumn, EntityTableColumn,
   EntityTableConfig,
   GroupActionDescriptor, HeaderActionDescriptor
 } from "../../models/entity/entities-table-config.models";
-import {AssetComponent} from "../asset/asset.component";
-import {AssetTabsComponent} from "../asset/asset-tabs.component";
 import {CameraComponent} from "./camera.component";
 import {CameraTabsComponent} from "./camera-tabs.component";
-import {CameraTableHeaderComponent} from "./camera-table-header.component";
 
 
 @Injectable()
@@ -80,11 +74,9 @@ export class CameraTableConfigResolver implements Resolve<EntityTableConfig<Devi
 
     this.config.loadEntity = id => this.deviceService.getDeviceInfo(id.id);
     //save device
-    this.config.saveEntity = device => {return this.deviceService.saveCamera(device).pipe(
-        tap(() => {
-          this.broadcast.broadcast('deviceSaved');
-        }),
-        mergeMap((savedDevice) => this.deviceService.getDeviceInfo(savedDevice.id.id)
+    this.config.saveEntity = device => {return this.deviceService.saveDevice(device).pipe(
+        tap(() => {this.broadcast.broadcast('deviceSaved');}),
+      mergeMap((savedDevice) => this.deviceService.getDeviceInfo(savedDevice.id.id)
       ));
     };
     this.config.onEntityAction = action => this.onDeviceAction(action);

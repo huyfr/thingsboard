@@ -68,9 +68,9 @@ export class DeviceService {
     return this.http.post<Device>('/api/device', device, defaultHttpOptionsFromConfig(config));
   }
 
-  public saveCamera(device: Device, config?: RequestConfig): Observable<Device> {
+/*  public saveCamera(device: Device, config?: RequestConfig): Observable<Device> {
     return this.http.post<Device>('/api/device/camera', device, defaultHttpOptionsFromConfig(config));
-  }
+  }*/
 
   public deleteDevice(deviceId: string, config?: RequestConfig) {
     return this.http.delete(`/api/device/${deviceId}`, defaultHttpOptionsFromConfig(config));

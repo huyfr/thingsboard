@@ -69,7 +69,7 @@
         <input matInput formControlName="label">
       </mat-form-field>
 <!--      <tb-entity-subtype-autocomplete  formControlName="type" [required]="true" [entityType]="entityType.DEVICE"></tb-entity-subtype-autocomplete>-->
-      <mat-form-field class="mat-block">
+      <mat-form-field class="mat-block" *ngIf="isHidden">
         <mat-label translate>type</mat-label>
         <input matInput formControlName="type">
       </mat-form-field>

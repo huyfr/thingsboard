@@ -21,6 +21,7 @@ import { EntityTableConfig } from '@home/models/entity/entities-table-config.mod
 export class CameraComponent extends EntityComponent<DeviceInfo> {
 
   entityType = EntityType;
+  isHidden = false;
 
   deviceScope: 'tenant' | 'customer' | 'customer_user';
 

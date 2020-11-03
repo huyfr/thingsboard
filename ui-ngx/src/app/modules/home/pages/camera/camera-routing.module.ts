@@ -3,8 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { EntitiesTableComponent } from '../../components/entity/entities-table.component';
 import {Authority} from "../../../../shared/models/authority.enum";
 import {CameraTableConfigResolver} from "./camera-table-config.resolver";
-import {AssetsTableConfigResolver} from "../asset/assets-table-config.resolver";
-import {CustomersTableConfigResolver} from "../customer/customers-table-config.resolver";
 
 const routes: Routes = [
   {

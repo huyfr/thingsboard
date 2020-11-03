@@ -42,7 +42,6 @@ import {
 import {CameraComponent} from "./camera.component";
 import {CameraTabsComponent} from "./camera-tabs.component";
 
-
 @Injectable()
 export class CameraTableConfigResolver implements Resolve<EntityTableConfig<DeviceInfo>> {
 
@@ -98,9 +97,7 @@ export class CameraTableConfigResolver implements Resolve<EntityTableConfig<Devi
           this.customerId = authUser.customerId;
         }
       }),
-      mergeMap(() =>
-        this.customerId ? this.customerService.getCustomer(this.customerId) : of(null as Customer)
-      ),
+      mergeMap(() => this.customerId ? this.customerService.getCustomer(this.customerId) : of(null as Customer)),
       map((parentCustomer) => {
         if (parentCustomer) {
           if (parentCustomer.additionalInfo && parentCustomer.additionalInfo.isPublic) {
@@ -129,35 +126,29 @@ export class CameraTableConfigResolver implements Resolve<EntityTableConfig<Devi
     const columns: Array<EntityTableColumn<DeviceInfo>> = [
       new DateEntityTableColumn<DeviceInfo>('createdTime', 'common.created-time', this.datePipe, '150px'),
       new EntityTableColumn<DeviceInfo>('name', 'device.name', '25%'),
+      new EntityTableColumn<DeviceInfo>('label', 'Url', '25%')
       // new EntityTableColumn<DeviceInfo>('type', 'device.device-type', '25%'),
-      new EntityTableColumn<DeviceInfo>('label', 'device.label', '25%')
+      // new EntityTableColumn<DeviceInfo>('label', 'device.label', '25%')
     ];
     if (deviceScope === 'tenant') {
       columns.push(
         new EntityTableColumn<DeviceInfo>('customerTitle', 'customer.customer', '25%'),
         new EntityTableColumn<DeviceInfo>('customerIsPublic', 'device.public', '60px',
-          entity => {
-            return checkBoxCell(entity.customerIsPublic);
-          }, () => ({}), false),
-      );
+          entity => {return checkBoxCell(entity.customerIsPublic);}, () => ({}), false),);
     }
-    columns.push(
-      new EntityTableColumn<DeviceInfo>('gateway', 'device.is-gateway', '60px',
+    columns.push(new EntityTableColumn<DeviceInfo>('gateway', 'device.is-gateway', '60px',
         entity => {
           return checkBoxCell(entity.additionalInfo && entity.additionalInfo.gateway);
-        }, () => ({}), false)
-    );
+        }, () => ({}), false));
     return columns;
   }
 
   configureEntityFunctions(deviceScope: string): void {
     if (deviceScope === 'tenant') {
-      this.config.entitiesFetchFunction = pageLink =>
-        this.deviceService.getTenantDeviceInfos(pageLink, this.config.componentsData.deviceType);
+      this.config.entitiesFetchFunction = pageLink => this.deviceService.getTenantDeviceInfos(pageLink, this.config.componentsData.deviceType);
       this.config.deleteEntity = id => this.deviceService.deleteDevice(id.id);
     } else {
-      this.config.entitiesFetchFunction = pageLink =>
-        this.deviceService.getCustomerDeviceInfos(this.customerId, pageLink, this.config.componentsData.deviceType);
+      this.config.entitiesFetchFunction = pageLink => this.deviceService.getCustomerDeviceInfos(this.customerId, pageLink, this.config.componentsData.deviceType);
       this.config.deleteEntity = id => this.deviceService.unassignDeviceFromCustomer(id.id);
     }
   }
@@ -165,127 +156,99 @@ export class CameraTableConfigResolver implements Resolve<EntityTableConfig<Devi
   configureCellActions(deviceScope: string): Array<CellActionDescriptor<DeviceInfo>> {
     const actions: Array<CellActionDescriptor<DeviceInfo>> = [];
     if (deviceScope === 'tenant') {
-      actions.push(
-        {
+      actions.push({
           name: this.translate.instant('device.make-public'),
           icon: 'share',
           isEnabled: (entity) => (!entity.customerId || entity.customerId.id === NULL_UUID),
           onAction: ($event, entity) => this.makePublic($event, entity)
-        },
-        {
+        }, {
           name: this.translate.instant('device.assign-to-customer'),
           icon: 'assignment_ind',
           isEnabled: (entity) => (!entity.customerId || entity.customerId.id === NULL_UUID),
           onAction: ($event, entity) => this.assignToCustomer($event, [entity.id])
-        },
-        {
+        }, {
           name: this.translate.instant('device.unassign-from-customer'),
           icon: 'assignment_return',
           isEnabled: (entity) => (entity.customerId && entity.customerId.id !== NULL_UUID && !entity.customerIsPublic),
           onAction: ($event, entity) => this.unassignFromCustomer($event, entity)
-        },
-        {
+        }, {
           name: this.translate.instant('device.make-private'),
           icon: 'reply',
           isEnabled: (entity) => (entity.customerId && entity.customerId.id !== NULL_UUID && entity.customerIsPublic),
           onAction: ($event, entity) => this.unassignFromCustomer($event, entity)
-        },
-        {
+        }, {
           name: this.translate.instant('device.manage-credentials'),
           icon: 'security',
           isEnabled: (entity) => true,
           onAction: ($event, entity) => this.manageCredentials($event, entity)
-        }
-      );
-    }
+        });}
     if (deviceScope === 'customer') {
-        actions.push(
-          {
+        actions.push({
             name: this.translate.instant('device.unassign-from-customer'),
             icon: 'assignment_return',
             isEnabled: (entity) => (entity.customerId && entity.customerId.id !== NULL_UUID && !entity.customerIsPublic),
             onAction: ($event, entity) => this.unassignFromCustomer($event, entity)
-          },
-          {
+          }, {
             name: this.translate.instant('device.make-private'),
             icon: 'reply',
             isEnabled: (entity) => (entity.customerId && entity.customerId.id !== NULL_UUID && entity.customerIsPublic),
             onAction: ($event, entity) => this.unassignFromCustomer($event, entity)
-          },
-          {
+          }, {
             name: this.translate.instant('device.manage-credentials'),
             icon: 'security',
             isEnabled: (entity) => true,
             onAction: ($event, entity) => this.manageCredentials($event, entity)
-          }
-        );
-    }
+          });}
     if (deviceScope === 'customer_user') {
-      actions.push(
-        {
+      actions.push({
           name: this.translate.instant('device.view-credentials'),
           icon: 'security',
           isEnabled: (entity) => true,
           onAction: ($event, entity) => this.manageCredentials($event, entity)
-        }
-      );
-    }
+        });}
     return actions;
   }
 
   configureGroupActions(deviceScope: string): Array<GroupActionDescriptor<DeviceInfo>> {
     const actions: Array<GroupActionDescriptor<DeviceInfo>> = [];
     if (deviceScope === 'tenant') {
-      actions.push(
-        {
+      actions.push({
           name: this.translate.instant('device.assign-devices'),
           icon: 'assignment_ind',
           isEnabled: true,
           onAction: ($event, entities) => this.assignToCustomer($event, entities.map((entity) => entity.id))
-        }
-      );
-    }
+        });}
     if (deviceScope === 'customer') {
-      actions.push(
-        {
+      actions.push({
           name: this.translate.instant('device.unassign-devices'),
           icon: 'assignment_return',
           isEnabled: true,
           onAction: ($event, entities) => this.unassignDevicesFromCustomer($event, entities)
-        }
-      );
-    }
+        });}
     return actions;
   }
 
   configureAddActions(deviceScope: string): Array<HeaderActionDescriptor> {
     const actions: Array<HeaderActionDescriptor> = [];
     if (deviceScope === 'tenant') {
-      actions.push(
-        {
+      actions.push({
           name: this.translate.instant('device.add-device-text'),
           icon: 'insert_drive_file',
           isEnabled: () => true,
           onAction: ($event) => this.config.table.addEntity($event)
-        },
-        {
+        }, {
           name: this.translate.instant('device.import'),
           icon: 'file_upload',
           isEnabled: () => true,
           onAction: ($event) => this.importDevices($event)
-        }
-      );
-    }
+        });}
     if (deviceScope === 'customer') {
-      actions.push(
-        {
+      actions.push({
           name: this.translate.instant('device.assign-new-device'),
           icon: 'add',
           isEnabled: () => true,
           onAction: ($event) => this.addDevicesToCustomer($event)
-        }
-      );
-    }
+        });}
     return actions;
   }
 

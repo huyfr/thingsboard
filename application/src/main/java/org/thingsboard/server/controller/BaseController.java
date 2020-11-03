@@ -87,6 +87,7 @@ import org.thingsboard.server.dao.entityview.EntityViewService;
 import org.thingsboard.server.dao.exception.DataValidationException;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.model.ModelConstants;
+import org.thingsboard.server.dao.organization.OrganizationService;
 import org.thingsboard.server.dao.relation.RelationService;
 import org.thingsboard.server.dao.rule.RuleChainService;
 import org.thingsboard.server.dao.tenant.TenantService;
@@ -104,6 +105,7 @@ import org.thingsboard.server.service.security.permission.AccessControlService;
 import org.thingsboard.server.service.security.permission.Operation;
 import org.thingsboard.server.service.security.permission.Resource;
 import org.thingsboard.server.service.state.DeviceStateService;
+import org.thingsboard.server.service.state.OrganizationStateService;
 import org.thingsboard.server.service.telemetry.AlarmSubscriptionService;
 import org.thingsboard.server.service.telemetry.TelemetrySubscriptionService;
 
@@ -144,6 +146,9 @@ public abstract class BaseController {
     protected DeviceService deviceService;
 
     @Autowired
+    protected OrganizationService organizationService;
+
+    @Autowired
     protected AssetService assetService;
 
     @Autowired
@@ -178,6 +183,9 @@ public abstract class BaseController {
 
     @Autowired
     protected DeviceStateService deviceStateService;
+
+    @Autowired
+    protected OrganizationStateService organizationStateService;
 
     @Autowired
     protected EntityViewService entityViewService;

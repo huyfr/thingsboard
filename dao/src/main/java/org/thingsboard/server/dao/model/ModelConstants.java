@@ -149,6 +149,17 @@ public class ModelConstants {
     public static final String DEVICE_TYPES_BY_TENANT_VIEW_NAME = "device_types_by_tenant";
 
     /**
+     * Cassandra organization constants.
+     */
+    public static final String ORGANIZATION_COLUMN_FAMILY_NAME = "organization";
+    public static final String ORGANIZATION_TENANT_ID_PROPERTY = TENANT_ID_PROPERTY;
+    public static final String ORGANIZATION_CUSTOMER_ID_PROPERTY = CUSTOMER_ID_PROPERTY;
+    public static final String ORGANIZATION_NAME_PROPERTY = "name";
+    public static final String ORGANIZATION_URL_PROPERTY = "url";
+    public static final String ORGANIZATION_ADDITIONAL_INFO_PROPERTY = ADDITIONAL_INFO_PROPERTY;
+
+
+    /**
      * Cassandra entityView constants.
      */
     public static final String ENTITY_VIEW_TABLE_FAMILY_NAME = "entity_view";

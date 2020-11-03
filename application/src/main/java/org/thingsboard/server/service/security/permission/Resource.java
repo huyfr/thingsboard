@@ -23,6 +23,7 @@ public enum Resource {
     ADMIN_SETTINGS(),
     ALARM(EntityType.ALARM),
     DEVICE(EntityType.DEVICE),
+    CAMERA(EntityType.CAMERA),
     ASSET(EntityType.ASSET),
     CUSTOMER(EntityType.CUSTOMER),
     DASHBOARD(EntityType.DASHBOARD),

@@ -1,8 +1,8 @@
-/*
 package org.thingsboard.server.dao.organization;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.thingsboard.server.common.data.Device;
@@ -20,19 +20,25 @@ import org.thingsboard.server.dao.service.DataValidator;
 @Slf4j
 public class OrganizationCredentialsServiceImpl extends AbstractEntityService implements OrganizationCredentialsService {
 
+    @Autowired
+    private OrganizationCredentialsDao organizationCredentialsDao;
+
+    @Autowired
+    private OrganizationService organizationService;
+
     @Override
     public OrganizationCredentials createCameraCredentials(TenantId tenantId, OrganizationCredentials organizationCredentials) {
-        return null;
+        return saveOrUpdate(tenantId, organizationCredentials);
     }
 
     private OrganizationCredentials saveOrUpdate(TenantId tenantId, OrganizationCredentials organizationCredentials) {
         if (organizationCredentials.getCredentialsType() == OrganizationCredentialsType.X509_CERTIFICATE) {
             formatCertData(organizationCredentials);
         }
-        log.trace("Executing updateDeviceCredentials [{}]", organizationCredentials);
+        log.trace("Executing updateOrganizationCredentials [{}]", organizationCredentials);
         credentialsValidator.validate(organizationCredentials, id -> tenantId);
         try {
-            return deviceCredentialsDao.save(tenantId, organizationCredentials);
+            return organizationCredentialsDao.save(tenantId, organizationCredentials);
         } catch (Exception t) {
             ConstraintViolationException e = extractConstraintViolationException(t).orElse(null);
             if (e != null && e.getConstraintName() != null
@@ -54,42 +60,41 @@ public class OrganizationCredentialsServiceImpl extends AbstractEntityService im
     private DataValidator<OrganizationCredentials> credentialsValidator = new DataValidator<OrganizationCredentials>() {
 
         @Override
-        protected void validateCreate(TenantId tenantId, DeviceCredentials deviceCredentials) {
-            if (deviceCredentialsDao.findByDeviceId(tenantId, deviceCredentials.getDeviceId().getId()) != null) {
+        protected void validateCreate(TenantId tenantId, OrganizationCredentials organizationCredentials) {
+            if (organizationCredentialsDao.findByDeviceId(tenantId, organizationCredentials.getOrganizationId().getId()) != null) {
                 throw new DataValidationException("Credentials for this device are already specified!");
             }
-            if (deviceCredentialsDao.findByCredentialsId(tenantId, deviceCredentials.getCredentialsId()) != null) {
-                throw new DataValidationException("Device credentials are already assigned to another device!");
+            if (organizationCredentialsDao.findByCredentialsId(tenantId, organizationCredentials.getCredentialsId()) != null) {
+                throw new DataValidationException("Organization credentials are already assigned to another device!");
             }
         }
 
         @Override
-        protected void validateUpdate(TenantId tenantId, DeviceCredentials deviceCredentials) {
-            if (deviceCredentialsDao.findById(tenantId, deviceCredentials.getUuidId()) == null) {
+        protected void validateUpdate(TenantId tenantId, OrganizationCredentials organizationCredentials) {
+            if (organizationCredentialsDao.findById(tenantId, organizationCredentials.getUuidId()) == null) {
                 throw new DataValidationException("Unable to update non-existent device credentials!");
             }
-            DeviceCredentials existingCredentials = deviceCredentialsDao.findByCredentialsId(tenantId, deviceCredentials.getCredentialsId());
-            if (existingCredentials != null && !existingCredentials.getId().equals(deviceCredentials.getId())) {
+            OrganizationCredentials existingCredentials = organizationCredentialsDao.findByCredentialsId(tenantId, organizationCredentials.getCredentialsId());
+            if (existingCredentials != null && !existingCredentials.getId().equals(organizationCredentials.getId())) {
                 throw new DataValidationException("Device credentials are already assigned to another device!");
             }
         }
 
         @Override
-        protected void validateDataImpl(TenantId tenantId, DeviceCredentials deviceCredentials) {
-            if (deviceCredentials.getDeviceId() == null) {
+        protected void validateDataImpl(TenantId tenantId, OrganizationCredentials organizationCredentials) {
+            if (organizationCredentials.getOrganizationId() == null) {
                 throw new DataValidationException("Device credentials should be assigned to device!");
             }
-            if (deviceCredentials.getCredentialsType() == null) {
+            if (organizationCredentials.getCredentialsType() == null) {
                 throw new DataValidationException("Device credentials type should be specified!");
             }
-            if (StringUtils.isEmpty(deviceCredentials.getCredentialsId())) {
+            if (StringUtils.isEmpty(organizationCredentials.getCredentialsId())) {
                 throw new DataValidationException("Device credentials id should be specified!");
             }
-            Device device = deviceService.findDeviceById(tenantId, deviceCredentials.getDeviceId());
-            if (device == null) {
+            Organization organization = organizationService.findDeviceById(tenantId, organizationCredentials.getOrganizationId());
+            if (organization == null) {
                 throw new DataValidationException("Can't assign device credentials to non-existent device!");
             }
         }
     };
 }
-*/

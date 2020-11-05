@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.thingsboard.server.common.data.*;
 import org.thingsboard.server.common.data.id.CustomerId;
 import org.thingsboard.server.common.data.id.OrganizationId;
 import org.thingsboard.server.common.data.id.TenantId;
-import org.thingsboard.server.common.data.security.DeviceCredentials;
 import org.thingsboard.server.common.data.security.organization.OrganizationCredentials;
 import org.thingsboard.server.common.data.security.organization.OrganizationCredentialsType;
 import org.thingsboard.server.dao.customer.CustomerDao;
@@ -39,6 +39,8 @@ import static org.thingsboard.server.dao.service.Validator.validateId;
 @Slf4j
 public class OrganizationServiceImpl extends AbstractEntityService implements OrganizationService {
 
+    public static final String INCORRECT_ORGANIZATION_ID = "Incorrect organizationId ";
+
     @Autowired
     private OrganizationDao organizationDao;
 
@@ -54,6 +56,9 @@ public class OrganizationServiceImpl extends AbstractEntityService implements Or
     @Autowired
     private CustomerDao customerDao;
 
+    @Autowired
+    private OrganizationCredentialsService organizationCredentialsService;
+
     @Override
     public void deleteCamera(TenantId tenantId, OrganizationId cameraId) {
         log.trace("Executing deleteDevice [{}]", cameraId);
@@ -66,8 +71,8 @@ public class OrganizationServiceImpl extends AbstractEntityService implements Or
                 throw new DataValidationException("Can't delete device that has entity views!");
             }
         } catch (ExecutionException | InterruptedException e) {
-            log.error("Exception while finding entity views for deviceId [{}]", cameraId, e);
-            throw new RuntimeException("Exception while finding entity views for deviceId [" + cameraId + "]", e);
+            log.error("Exception while finding entity views for organizationId [{}]", cameraId, e);
+            throw new RuntimeException("Exception while finding entity views for organizationId [" + cameraId + "]", e);
         }
         deleteEntityRelations(tenantId, cameraId);
 
@@ -83,6 +88,45 @@ public class OrganizationServiceImpl extends AbstractEntityService implements Or
     @Override
     public Organization saveCamera(Organization camera) {
         return doSaveCamera(camera);
+    }
+
+    @Override
+    public Organization saveCameraWithAccessToken(Organization camera, String accessToken) {
+        return doSaveCameraWithAccessToken(camera, accessToken);
+    }
+
+    @Override
+    public Organization findDeviceById(TenantId tenantId, OrganizationId organizationId) {
+        log.trace("Executing findDeviceById [{}]", organizationId);
+        validateId(organizationId, INCORRECT_ORGANIZATION_ID + organizationId);
+        if (TenantId.SYS_TENANT_ID.equals(tenantId)) {
+            return organizationDao.findById(tenantId, organizationId.getId());
+        } else {
+            return organizationDao.findDeviceByTenantIdAndId(tenantId, organizationId.getId());
+        }
+    }
+
+    private Organization doSaveCameraWithAccessToken(Organization camera, String accessToken) {
+        cameraValidator.validate(camera, Organization::getTenantId);
+        Organization savedCamera;
+        try {
+            savedCamera = organizationDao.save(camera.getTenantId(), camera);
+        } catch (Exception t) {
+            ConstraintViolationException e = extractConstraintViolationException(t).orElse(null);
+            if (e != null && e.getConstraintName() != null && e.getConstraintName().equalsIgnoreCase("device_name_unq_key")) {
+                throw new DataValidationException("Camera with such name already exists!");
+            } else {
+                throw t;
+            }
+        }
+        if (camera.getId() == null) {
+            OrganizationCredentials organizationCredentials = new OrganizationCredentials();
+            organizationCredentials.setOrganizationId(new OrganizationId(savedCamera.getUuidId()));
+            organizationCredentials.setOrganizationCredentialsType(OrganizationCredentialsType.ACCESS_TOKEN);
+            organizationCredentials.setCredentialsId(!StringUtils.isEmpty(accessToken) ? accessToken : RandomStringUtils.randomAlphanumeric(20));
+            organizationCredentialsService.createCameraCredentials(camera.getTenantId(), organizationCredentials);
+        }
+        return savedCamera;
     }
 
     private Organization doSaveCamera(Organization camera) {

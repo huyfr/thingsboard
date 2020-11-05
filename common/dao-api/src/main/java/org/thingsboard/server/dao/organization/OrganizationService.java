@@ -10,4 +10,8 @@ public interface OrganizationService {
 
     Organization saveCamera(Organization camera);
 
+    Organization saveCameraWithAccessToken(Organization camera, String accessToken);
+
+    Organization findDeviceById(TenantId tenantId, OrganizationId organizationId);
+
 }

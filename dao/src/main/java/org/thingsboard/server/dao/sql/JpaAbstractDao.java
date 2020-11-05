@@ -34,9 +34,7 @@ import java.util.UUID;
  * @author Valerii Sosliuk
  */
 @Slf4j
-public abstract class JpaAbstractDao<E extends BaseEntity<D>, D>
-        extends JpaAbstractDaoListeningExecutorService
-        implements Dao<D> {
+public abstract class JpaAbstractDao<E extends BaseEntity<D>, D> extends JpaAbstractDaoListeningExecutorService implements Dao<D> {
 
     protected abstract Class<E> getEntityClass();
 

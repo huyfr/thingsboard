@@ -14,7 +14,6 @@ public class Organization extends SearchTextBasedWithAdditionalInfo<Organization
     private CustomerId customerId;
     private String name;
     private String url;
-    private String description;
 
     public Organization() {
         super();
@@ -29,7 +28,6 @@ public class Organization extends SearchTextBasedWithAdditionalInfo<Organization
         this.tenantId = organization.getTenantId();
         this.customerId = organization.getCustomerId();
         this.url = organization.getUrl();
-        this.description = organization.getDescription();
     }
 
     public String getUrl() {
@@ -38,14 +36,6 @@ public class Organization extends SearchTextBasedWithAdditionalInfo<Organization
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Override
@@ -87,7 +77,6 @@ public class Organization extends SearchTextBasedWithAdditionalInfo<Organization
                 ", customerId=" + customerId +
                 ", name='" + name + '\'' +
                 ", url='" + url + '\'' +
-                ", description='" + description + '\'' +
                 ", createdTime=" + createdTime +
                 ", id=" + id +
                 '}';

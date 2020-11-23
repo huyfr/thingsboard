@@ -14,7 +14,7 @@
 /// limitations under the License.
 ///
 
-import { Component, Inject } from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '@core/core.state';
 import { EntityComponent } from '../../components/entity/entity.component';
@@ -27,6 +27,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { DeviceService } from '@core/http/device.service';
 import { ClipboardService } from 'ngx-clipboard';
 import { EntityTableConfig } from '@home/models/entity/entities-table-config.models';
+import {HttpErrorResponse} from "@angular/common/http";
+import {LoginShinobiRequest} from "../../../../shared/models/loginShinobi.models";
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'tb-device',
@@ -36,6 +39,12 @@ import { EntityTableConfig } from '@home/models/entity/entities-table-config.mod
 export class DeviceComponent extends EntityComponent<DeviceInfo> {
 
   entityType = EntityType;
+  tempApi: string = '';
+  embedApi: string;
+  embedLink: SafeResourceUrl;
+  host = "http://localhost:8888/";
+  template_embed = "/embed/OmJo9mFdlm/y7n5s8bElt/jquery|fullscreen";
+  isDisplay: boolean = false;
 
   deviceScope: 'tenant' | 'customer' | 'customer_user';
 
@@ -43,6 +52,7 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
               protected translate: TranslateService,
               private deviceService: DeviceService,
               private clipboardService: ClipboardService,
+              private domSanitizer: DomSanitizer,
               @Inject('entity') protected entityValue: DeviceInfo,
               @Inject('entitiesTableConfig') protected entitiesTableConfigValue: EntityTableConfig<DeviceInfo>,
               public fb: FormBuilder) {
@@ -118,6 +128,27 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
                 horizontalPosition: 'right'
               }));
           }
+        }
+      );
+    }
+  }
+
+  apiKey: LoginShinobiRequest = {
+    "mail": "huytran059@gmail.com",
+    "pass": "123456"
+  };
+
+  getApiKey(): void {
+    if (this.tempApi !== '') {
+      this.isDisplay = !this.isDisplay;
+    } else {
+      this.isDisplay = !this.isDisplay;
+      this.deviceService.getApiKeyShinobi(this.apiKey).subscribe((result) => {
+          this.tempApi = result.$user.auth_token;
+          this.embedApi = this.host + this.tempApi + this.template_embed;
+          this.embedLink = this.domSanitizer.bypassSecurityTrustResourceUrl(this.embedApi);
+        }, (error: HttpErrorResponse) => {
+          console.log(error);
         }
       );
     }

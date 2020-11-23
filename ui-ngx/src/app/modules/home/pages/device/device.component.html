@@ -61,6 +61,11 @@
       <mat-icon svgIcon="mdi:clipboard-arrow-left"></mat-icon>
       <span translate>device.copyAccessToken</span>
     </button>
+
+    <button mat-raised-button (click)="getApiKey()">
+      <span *ngIf="isDisplay; else openBlock" >Close Camera</span>
+      <ng-template #openBlock>Open Camera</ng-template>
+    </button>
   </div>
 </div>
 <div class="mat-padding" fxLayout="column">
@@ -74,6 +79,7 @@
        [fxShow]="!isEdit && entity?.customerIsPublic && (deviceScope === 'customer' || deviceScope === 'tenant')">
     {{ 'device.device-public' | translate }}
   </div>
+
   <form [formGroup]="entityForm">
     <fieldset [disabled]="(isLoading$ | async) || !isEdit">
       <mat-form-field class="mat-block">
@@ -104,4 +110,8 @@
       </div>
     </fieldset>
   </form>
+
+  <div *ngIf="isDisplay">
+      <iframe [src]="embedLink" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
 </div>

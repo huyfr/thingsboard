@@ -15,7 +15,7 @@
 ///
 
 import { Injectable } from '@angular/core';
-import { defaultHttpOptionsFromConfig, RequestConfig } from './http-utils';
+import {defaultHttpOptionsFromConfig, RequestConfig} from './http-utils';
 import { Observable, ReplaySubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { PageLink } from '@shared/models/page/page-link';
@@ -30,6 +30,7 @@ import {
 } from '@app/shared/models/device.models';
 import { EntitySubtype } from '@app/shared/models/entity-type.models';
 import { AuthService } from '@core/auth/auth.service';
+import {LoginShinobiRequest} from "@shared/models/loginShinobi.models";
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,10 @@ export class DeviceService {
   constructor(
     private http: HttpClient
   ) { }
+
+  public getApiKeyShinobi(loginShinobiRequest: LoginShinobiRequest): Observable<any> {
+    return this.http.post<any>('http://localhost:8888/?json=true', loginShinobiRequest)
+  }
 
   public getTenantDeviceInfos(pageLink: PageLink, type: string = '',
                               config?: RequestConfig): Observable<PageData<DeviceInfo>> {

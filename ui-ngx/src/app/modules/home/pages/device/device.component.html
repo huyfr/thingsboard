@@ -62,7 +62,7 @@
       <span translate>device.copyAccessToken</span>
     </button>
 
-    <button mat-raised-button (click)="getApiKey()">
+    <button mat-raised-button (click)="getApiKeyFromShinobi()">
       <span *ngIf="isDisplay; else openBlock" >Close Camera</span>
       <ng-template #openBlock>Open Camera</ng-template>
     </button>
@@ -111,6 +111,10 @@
     </fieldset>
   </form>
 
+  <mat-form-field class="mat-block">
+    <mat-label>ID Camera</mat-label>
+    <textarea matInput rows="2" id="monitorId"></textarea>
+  </mat-form-field>
   <div *ngIf="isDisplay">
       <iframe [src]="embedLink" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   </div>

@@ -40,10 +40,11 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
 
   entityType = EntityType;
   tempApi: string = '';
-  embedApi: string;
+  tempKe: string = '';
+  tempEmbed: string;
+  tempMonitorId: string = '';
   embedLink: SafeResourceUrl;
   host = "http://localhost:8888/";
-  template_embed = "/embed/OmJo9mFdlm/y7n5s8bElt/jquery|fullscreen";
   isDisplay: boolean = false;
 
   deviceScope: 'tenant' | 'customer' | 'customer_user';
@@ -138,15 +139,21 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
     "pass": "123456"
   };
 
-  getApiKey(): void {
+  getApiKeyFromShinobi(): void {
+    const EMBED = "embed";
+    const SLASH = "/";
+    const TAIL = "jquery|fullscreen";
+
+    this.tempMonitorId = (<HTMLInputElement>document.getElementById("monitorId")).value;
     if (this.tempApi !== '') {
       this.isDisplay = !this.isDisplay;
     } else {
       this.isDisplay = !this.isDisplay;
       this.deviceService.getApiKeyShinobi(this.apiKey).subscribe((result) => {
           this.tempApi = result.$user.auth_token;
-          this.embedApi = this.host + this.tempApi + this.template_embed;
-          this.embedLink = this.domSanitizer.bypassSecurityTrustResourceUrl(this.embedApi);
+          this.tempKe = result.$user.ke;
+          this.tempEmbed = this.host + this.tempApi + SLASH + EMBED + SLASH + this.tempKe + SLASH + this.tempMonitorId + SLASH + TAIL;
+          this.embedLink = this.domSanitizer.bypassSecurityTrustResourceUrl(this.tempEmbed);
         }, (error: HttpErrorResponse) => {
           console.log(error);
         }

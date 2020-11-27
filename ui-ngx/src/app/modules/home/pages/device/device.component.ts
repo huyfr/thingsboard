@@ -15,21 +15,21 @@
 ///
 
 import {Component, Inject} from '@angular/core';
-import { Store } from '@ngrx/store';
-import { AppState } from '@core/core.state';
-import { EntityComponent } from '../../components/entity/entity.component';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DeviceInfo } from '@shared/models/device.models';
-import { EntityType } from '@shared/models/entity-type.models';
-import { NULL_UUID } from '@shared/models/id/has-uuid';
-import { ActionNotificationShow } from '@core/notification/notification.actions';
-import { TranslateService } from '@ngx-translate/core';
-import { DeviceService } from '@core/http/device.service';
-import { ClipboardService } from 'ngx-clipboard';
-import { EntityTableConfig } from '@home/models/entity/entities-table-config.models';
+import {Store} from '@ngrx/store';
+import {AppState} from '@core/core.state';
+import {EntityComponent} from '../../components/entity/entity.component';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {DeviceInfo} from '@shared/models/device.models';
+import {EntityType} from '@shared/models/entity-type.models';
+import {NULL_UUID} from '@shared/models/id/has-uuid';
+import {ActionNotificationShow} from '@core/notification/notification.actions';
+import {TranslateService} from '@ngx-translate/core';
+import {DeviceService} from '@core/http/device.service';
+import {ClipboardService} from 'ngx-clipboard';
+import {EntityTableConfig} from '@home/models/entity/entities-table-config.models';
 import {HttpErrorResponse} from "@angular/common/http";
 import {LoginShinobiRequest} from "../../../../shared/models/loginShinobi.models";
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'tb-device',
@@ -43,6 +43,8 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
   tempKe: string = '';
   tempEmbed: string;
   tempMonitorId: string = '';
+  monitorId: string = '';
+  message: string = '';
   embedLink: SafeResourceUrl;
   host = "http://localhost:8888/";
   isDisplay: boolean = false;
@@ -97,8 +99,10 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
     this.entityForm.patchValue({name: entity.name});
     this.entityForm.patchValue({type: entity.type});
     this.entityForm.patchValue({label: entity.label});
-    this.entityForm.patchValue({additionalInfo:
-        {gateway: entity.additionalInfo ? entity.additionalInfo.gateway : false}});
+    this.entityForm.patchValue({
+      additionalInfo:
+        {gateway: entity.additionalInfo ? entity.additionalInfo.gateway : false}
+    });
     this.entityForm.patchValue({additionalInfo: {description: entity.additionalInfo ? entity.additionalInfo.description : ''}});
   }
 
@@ -146,18 +150,29 @@ export class DeviceComponent extends EntityComponent<DeviceInfo> {
 
     this.tempMonitorId = (<HTMLInputElement>document.getElementById("monitorId")).value;
     if (this.tempApi !== '') {
-      this.isDisplay = !this.isDisplay;
+      if (this.monitorId === this.tempMonitorId) {
+        this.isDisplay = !this.isDisplay;
+      } else {
+        this.isDisplay = !this.isDisplay;
+        this.monitorId = this.tempMonitorId;
+        this.tempEmbed = this.host + this.tempApi + SLASH + EMBED + SLASH + this.tempKe + SLASH + this.monitorId + SLASH + TAIL;
+        this.embedLink = this.domSanitizer.bypassSecurityTrustResourceUrl(this.tempEmbed);
+      }
     } else {
-      this.isDisplay = !this.isDisplay;
-      this.deviceService.getApiKeyShinobi(this.apiKey).subscribe((result) => {
-          this.tempApi = result.$user.auth_token;
-          this.tempKe = result.$user.ke;
-          this.tempEmbed = this.host + this.tempApi + SLASH + EMBED + SLASH + this.tempKe + SLASH + this.tempMonitorId + SLASH + TAIL;
-          this.embedLink = this.domSanitizer.bypassSecurityTrustResourceUrl(this.tempEmbed);
-        }, (error: HttpErrorResponse) => {
-          console.log(error);
-        }
-      );
+      if (this.tempMonitorId !== '') {
+        this.isDisplay = !this.isDisplay;
+        this.deviceService.getApiKeyShinobi(this.apiKey).subscribe((result) => {
+            this.tempApi = result.$user.auth_token;
+            this.tempKe = result.$user.ke;
+            this.tempEmbed = this.host + this.tempApi + SLASH + EMBED + SLASH + this.tempKe + SLASH + this.tempMonitorId + SLASH + TAIL;
+            this.embedLink = this.domSanitizer.bypassSecurityTrustResourceUrl(this.tempEmbed);
+          }, (error: HttpErrorResponse) => {
+            console.log(error);
+          }
+        );
+      } else {
+        this.message = "Can't display camera!"
+      }
     }
   }
 }

@@ -87,7 +87,6 @@ import org.thingsboard.server.dao.entityview.EntityViewService;
 import org.thingsboard.server.dao.exception.DataValidationException;
 import org.thingsboard.server.dao.exception.IncorrectParameterException;
 import org.thingsboard.server.dao.model.ModelConstants;
-import org.thingsboard.server.dao.organization.OrganizationService;
 import org.thingsboard.server.dao.relation.RelationService;
 import org.thingsboard.server.dao.rule.RuleChainService;
 import org.thingsboard.server.dao.tenant.TenantService;
@@ -144,9 +143,6 @@ public abstract class BaseController {
 
     @Autowired
     protected DeviceService deviceService;
-
-    @Autowired
-    protected OrganizationService organizationService;
 
     @Autowired
     protected AssetService assetService;
